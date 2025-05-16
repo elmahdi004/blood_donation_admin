@@ -23,11 +23,20 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $types = ['utilisateur', 'centre_de_don', 'admin'];
+        $type = $this->faker->randomElement($types);
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
+            'nom' => $this->faker->lastName(),
+            'prenom' => $type === 'utilisateur' ? $this->faker->firstName() : null,
+            'email' => $this->faker->unique()->safeEmail(),
+            'date_de_naissance' => $type === 'utilisateur' ? $this->faker->date() : null,
+            'telephone' => $this->faker->phoneNumber(),
             'password' => static::$password ??= Hash::make('password'),
+            'type' => $type,
+            'groupe_sanguin' => $type === 'utilisateur' ? $this->faker->randomElement(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']) : null,
+            'adresse' => $this->faker->address(),
+            'status' => $type === 'centre_de_don' ? $this->faker->randomElement(['active', 'inactive']) : null,
+            'email_verified_at' => now(),
             'remember_token' => Str::random(10),
         ];
     }

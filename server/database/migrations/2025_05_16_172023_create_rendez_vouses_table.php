@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('rendez_vouses', function (Blueprint $table) {
             $table->id('rendez_vous_id');
-            $table->foreignId('slot_id')->constrained('available_slots')->onDelete('cascade');
+            // $table->unsignedBigInteger('slot_id');
+            $table->foreignId('slot_id')->constrained('available_slots','slot_id')->onDelete('cascade');
             $table->enum('status', ['pending', 'confirmed', 'cancelled', 'completed']);
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();

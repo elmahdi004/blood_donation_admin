@@ -16,8 +16,13 @@ class AvailableSlotFactory extends Factory
      */
     public function definition(): array
     {
+        $start = $this->faker->dateTimeBetween('+1 days', '+10 days');
+        $end = (clone $start)->modify('+1 hour');
         return [
-            //
+            'centre_id' => \App\Models\User::factory(),
+            'start_time' => $start,
+            'end_time' => $end,
+            'is_booked' => false,
         ];
     }
 }

@@ -1,0 +1,20 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class IntentionDonSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $users = \App\Models\User::where('type', 'utilisateur')->get();
+        foreach ($users as $user) {
+            \App\Models\IntentionDon::factory()->count(1)->create(['user_id' => $user->id]);
+        }
+    }
+}
