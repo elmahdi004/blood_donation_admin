@@ -12,13 +12,6 @@ class ReponseBesoinSeeder extends Seeder
      */
     public function run(): void
     {
-        $demandes = \App\Models\Demande::all();
-        $users = \App\Models\User::where('type', 'utilisateur')->get();
-        foreach ($demandes as $demande) {
-            \App\Models\ReponseBesoin::factory()->count(1)->create([
-                'demande_id' => $demande->demande_id,
-                'user_id' => $users->random()->id
-            ]);
-        }
+        //
     }
 }

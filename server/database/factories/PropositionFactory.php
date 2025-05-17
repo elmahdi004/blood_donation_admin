@@ -17,10 +17,7 @@ class PropositionFactory extends Factory
     public function definition(): array
     {
         return [
-            'date' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
-            'message' => $this->faker->sentence(),
-            'demande_id' => \App\Models\Demande::factory(),
-            'user_id' => \App\Models\User::factory(),
+            //
         ];
     }
 }

@@ -17,11 +17,7 @@ class NotificationFactory extends Factory
     public function definition(): array
     {
         return [
-            'type' => $this->faker->randomElement(['info', 'alert', 'reminder']),
-            'message' => $this->faker->sentence(),
-            'status' => $this->faker->randomElement(['unread', 'read']),
-            'date' => $this->faker->dateTimeBetween('-1 month', 'now'),
-            'user_id' => \App\Models\User::factory(),
+            //
         ];
     }
 }

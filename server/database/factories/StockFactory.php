@@ -17,9 +17,7 @@ class StockFactory extends Factory
     public function definition(): array
     {
         return [
-            'groupe_sanguin' => $this->faker->randomElement(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
-            'quantite' => $this->faker->numberBetween(1, 50),
-            'centre_id' => \App\Models\User::factory(),
+            //
         ];
     }
 }

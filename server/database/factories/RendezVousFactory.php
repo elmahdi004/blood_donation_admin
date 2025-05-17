@@ -17,9 +17,7 @@ class RendezVousFactory extends Factory
     public function definition(): array
     {
         return [
-            'slot_id' => \App\Models\AvailableSlot::factory(),
-            'status' => $this->faker->randomElement(['pending', 'confirmed', 'cancelled', 'completed']),
-            'user_id' => \App\Models\User::factory(),
+            //
         ];
     }
 }

@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('propositions', function (Blueprint $table) {
             $table->id('proposition_id');
-            $table->unsignedBigInteger('demande_id');
             $table->dateTime('date');
             $table->text('message')->nullable();
-            $table->foreign('demande_id')->references('demande_id')->on('demandes')->onDelete('cascade');
+            $table->foreignId('demande_id')->constrained('demandes')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });

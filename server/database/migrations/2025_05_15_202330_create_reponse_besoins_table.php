@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::create('reponse_besoins', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('demande_id');
             $table->enum('etat', ['pending', 'accepted', 'rejected']);
             $table->text('message')->nullable();
             $table->timestamp('date_reponse');
             $table->boolean('valide')->default(false);
-            $table->foreign('demande_id')->references('demande_id')->on('demandes')->onDelete('cascade');
+            $table->foreignId('demande_id')->constrained('demandes')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
