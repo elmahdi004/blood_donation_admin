@@ -9,7 +9,7 @@
         </h2>
       </div>
       <form class="mt-8 space-y-6" @submit.prevent="handleSubmit">
-        <div class="rounded-md shadow-sm space-y-4">
+        <div class="rounded-md space-y-4">
           <div>
             <label for="nom" class="block text-sm font-medium text-gray-700"
               >Nom</label
@@ -227,8 +227,8 @@
 
 <script setup lang="ts">
 import { ref, reactive } from "vue";
-import { useAuth } from "../composables/useAuth";
-import { registerSchema } from "../utils/validation";
+import { useAuth } from "../composables/useAuth.ts";
+import { registerSchema } from "../utils/validation.ts";
 import { useToast } from "vue-toastification";
 
 definePageMeta({

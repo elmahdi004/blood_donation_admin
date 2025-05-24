@@ -9,7 +9,7 @@
         </h2>
       </div>
       <form class="mt-8 space-y-6" @submit.prevent="handleSubmit">
-        <div class="rounded-md shadow-sm -space-y-px my-3">
+        <div class="rounded-md shadow-sm -space-y-px">
           <div>
             <label for="email" class="sr-only">Email</label>
             <input
@@ -19,12 +19,8 @@
               type="email"
               required
               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              :class="{ 'border-red-500': errors.email }"
               placeholder="Email"
             />
-            <p v-if="errors.email" class="mt-1 text-sm text-red-600">
-              {{ errors.email }}
-            </p>
           </div>
           <div>
             <label for="password" class="sr-only">Mot de passe</label>
@@ -35,12 +31,8 @@
               type="password"
               required
               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              :class="{ 'border-red-500': errors.password }"
               placeholder="Mot de passe"
             />
-            <p v-if="errors.password" class="mt-1 text-sm text-red-600">
-              {{ errors.password }}
-            </p>
           </div>
         </div>
 
@@ -59,12 +51,12 @@
           </div>
 
           <div class="text-sm">
-            <NuxtLink
-              to="/forgot-password"
+            <a
+              href="#"
               class="font-medium text-indigo-600 hover:text-indigo-500"
             >
               Mot de passe oublié?
-            </NuxtLink>
+            </a>
           </div>
         </div>
 
@@ -79,16 +71,17 @@
           </button>
         </div>
 
+        <div v-if="error" class="text-red-500 text-sm text-center">
+          {{ error }}
+        </div>
+
         <div class="text-center">
-          <p class="text-sm text-gray-600">
-            Pas encore de compte?
-            <NuxtLink
-              to="/register"
-              class="font-medium text-indigo-600 hover:text-indigo-500"
-            >
-              S'inscrire
-            </NuxtLink>
-          </p>
+          <NuxtLink
+            to="/register"
+            class="font-medium text-indigo-600 hover:text-indigo-500"
+          >
+            Pas encore de compte? S'inscrire
+          </NuxtLink>
         </div>
       </form>
     </div>
@@ -96,51 +89,52 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref } from "vue";
 import { useAuth } from "../composables/useAuth";
 import { loginSchema } from "../utils/validation";
 import { useToast } from "vue-toastification";
 
-definePageMeta({
-  layout: false,
-});
+const router = useRouter();
 const { login } = useAuth();
 const toast = useToast();
-const loading = ref(false);
-const errors = reactive({
-  email: "",
-  password: "",
-});
 
-const form = reactive({
+const form = ref({
   email: "",
   password: "",
   remember: false,
 });
 
+const loading = ref(false);
+const error = ref("");
+
 const handleSubmit = async () => {
   try {
-    // Reset errors
-    errors.email = "";
-    errors.password = "";
+    loading.value = true;
+    error.value = "";
 
-    // Validate form
-    const result = loginSchema.safeParse(form);
-    if (!result.success) {
-      const formattedErrors = result.error.format();
-      if (formattedErrors.email)
-        errors.email = formattedErrors.email._errors[0];
-      if (formattedErrors.password)
-        errors.password = formattedErrors.password._errors[0];
+    // Validate form data
+    const validationResult = loginSchema.safeParse(form.value);
+    if (!validationResult.success) {
+      error.value = validationResult.error.errors[0].message;
       return;
     }
 
-    loading.value = true;
-    await login(form.email, form.password, form.remember);
+    // Attempt login
+    const response = await login(
+      form.value.email,
+      form.value.password,
+      form.value.remember
+    );
+
+    // Show success message
     toast.success("Connexion réussie!");
-    await navigateTo("/dashboard");
-  } catch (error: any) {
-    toast.error(error.message || "Une erreur est survenue");
+
+    // Redirect to dashboard
+    router.push("/dashboard");
+  } catch (err: any) {
+    console.error("Login error:", err);
+    error.value = err.message || "Une erreur est survenue lors de la connexion";
+    toast.error(error.value);
   } finally {
     loading.value = false;
   }
