@@ -15,7 +15,11 @@ export default defineNuxtConfig({
   routeRules: {
     '/api/**': {
       cors: true
-    }
+    },
+    '/dashboard/**': { middleware: ['auth'] },
+    '/settings/**': { middleware: ['auth'] },
+    '/demandes/**': { middleware: ['auth'] },
+    '/customers/**': { middleware: ['auth'] },
   },
 
   future: {
@@ -30,6 +34,12 @@ export default defineNuxtConfig({
         commaDangle: 'never',
         braceStyle: '1tbs'
       }
+    }
+  },
+
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.API_BASE || 'http://localhost:8000/api'
     }
   }
 })
