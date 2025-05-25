@@ -58,6 +58,10 @@ import type { TableColumn } from "@nuxt/ui";
 
 const UBadge = resolveComponent("UBadge");
 
+// definePageMeta({
+//   middleware: "auth",
+// });
+
 type Demande = {
   demande_id: number;
   groupe_sanguin: string;

@@ -262,6 +262,11 @@ const form = reactive({
   password_confirmation: "",
 });
 
+
+definePageMeta({
+  layout: false,
+});
+
 const handleSubmit = async () => {
   try {
     // Reset errors
@@ -287,7 +292,7 @@ const handleSubmit = async () => {
     loading.value = true;
     await register(form);
     toast.success("Inscription réussie!");
-    // navigateTo("/login");
+    navigateTo("/");
   } catch (error: any) {
     toast.error(error.message || "Une erreur est survenue");
   } finally {

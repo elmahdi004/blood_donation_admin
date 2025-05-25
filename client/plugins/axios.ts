@@ -42,7 +42,7 @@ api.interceptors.response.use(
     console.error("API Error:", error.response || error);
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-      navigateTo("/login");
+    //   navigateTo("/login");
     }
     return Promise.reject(error);
   }

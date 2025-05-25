@@ -107,6 +107,10 @@ const form = ref({
 const loading = ref(false);
 const error = ref("");
 
+definePageMeta({
+  layout: false,
+});
+
 const handleSubmit = async () => {
   try {
     loading.value = true;
@@ -130,7 +134,7 @@ const handleSubmit = async () => {
     toast.success("Connexion réussie!");
 
     // Redirect to dashboard
-    router.push("/dashboard");
+    router.push("/");
   } catch (err: any) {
     console.error("Login error:", err);
     error.value = err.message || "Une erreur est survenue lors de la connexion";

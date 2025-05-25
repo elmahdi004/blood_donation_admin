@@ -15,6 +15,7 @@
     "@iconify-json/lucide": "^1.2.34",
     "@iconify-json/simple-icons": "^1.2.30",
     "@nuxt/ui-pro": "^3.0.2",
+    "@nuxtjs/auth-next": "^5.0.0-1667386184.dfbbb54",
     "@unovis/ts": "^1.5.1",
     "@unovis/vue": "^1.5.1",
     "@vueuse/nuxt": "^13.0.0",

@@ -1,13 +1,17 @@
-export default defineNuxtRouteMiddleware((to, from) => {
-  const token = localStorage.getItem("token");
+// export default defineNuxtRouteMiddleware((to, from) => {
 
-  // If no token and trying to access a protected route
-  if (!token && to.path !== "/login" && to.path !== "/register") {
-    return navigateTo("/login");
-  }
+//     const storedToken = localStorage.getItem("token");
 
-  // If has token and trying to access auth pages
-  if (token && (to.path === "/login" || to.path === "/register")) {
-    return navigateTo("/dashboard");
-  }
-});
+//     // If no token and trying to access a protected route
+//     if (!storedToken && to.path !== "/login" && to.path !== "/register") {
+//       console.log("No token and trying to access a protected route");
+//       return navigateTo("/login");
+//     }
+
+//     // If has token and trying to access auth pages
+//     if (storedToken && (to.path === "/login" || to.path === "/register")) {
+//       console.log("Has token and trying to access auth pages");
+//       return navigateTo("/");
+//     }
+//   }
+// );

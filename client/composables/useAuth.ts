@@ -1,40 +1,41 @@
 import { ref } from "vue";
 // import { useNuxtApp } from "#app";
-import axios from "axios";
-import type { AxiosInstance } from "axios";
+// import axios from "axios";
+// import type { AxiosInstance } from "axios";
+import api from "../plugins/axios";
 
 // Create a new axios instance
-const api: AxiosInstance = axios.create({
-    baseURL: "http://127.0.0.1:8000/api",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "X-Requested-With": "XMLHttpRequest",
-    },
-    withCredentials: false,
-  });
+// const api: AxiosInstance = axios.create({
+//     baseURL: "http://127.0.0.1:8000/api",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Accept: "application/json",
+//       "X-Requested-With": "XMLHttpRequest",
+//     },
+//     withCredentials: false,
+//   });
 
-// Add request interceptor to add token to requests
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// // Add request interceptor to add token to requests
+// api.interceptors.request.use((config) => {
+//   const token = localStorage.getItem("token");
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`;
+//   }
+//   return config;
+// });
 
-// Add response interceptor to handle errors
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized access
-      localStorage.removeItem("token");
-      navigateTo("/login");
-    }
-    return Promise.reject(error);
-  }
-);
+// // Add response interceptor to handle errors
+// api.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response?.status === 401) {
+//       // Handle unauthorized access
+//       localStorage.removeItem("token");
+//       navigateTo("/login");
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 interface User {
   id: number;
