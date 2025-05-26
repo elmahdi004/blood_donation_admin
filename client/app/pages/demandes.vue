@@ -52,6 +52,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
+import api from "../plugins/axios";
 import axios from "axios";
 import { h, resolveComponent } from "vue";
 import type { TableColumn } from "@nuxt/ui";
@@ -186,7 +187,7 @@ const fetchDemandes = async () => {
     Object.keys(params).forEach((key) => {
       if (params[key] === "") delete params[key];
     });
-    const response = await axios.get("http://localhost:8000/api/demandes", {
+    const response = await api.get("/demandes", {
       params,
     });
     demandes.value = response.data.data;

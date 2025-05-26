@@ -5,27 +5,26 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\DemandeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BloodBankController;
+use App\Http\Controllers\UserController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
-Route::resource('demandes', DemandeController::class);
-
-// Public routes
+// Public routes (no authentication required)
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-
-// Blood Bank Authentication Routes
 Route::post('/blood-banks/register', [BloodBankController::class, 'register']);
 Route::post('/blood-banks/login', [BloodBankController::class, 'login']);
 
-// Protected routes
+// Protected routes (require authentication)
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
+    // User info route
     Route::get('/user', [AuthController::class, 'user']);
-    
-    // Blood Bank Management Routes
-    Route::apiResource('blood-banks', BloodBankController::class)->except(['store']);
-    Route::patch('/blood-banks/{bloodBank}/status', [BloodBankController::class, 'updateStatus']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Routes that require specific roles
+    Route::middleware('role:admin,blood_bank')->group(function () {
+        // Blood Bank Management Routes
+        Route::apiResource('blood-banks', BloodBankController::class)->except(['store']);
+        Route::apiResource('demandes', DemandeController::class);
+        Route::patch('/blood-banks/{bloodBank}/status', [BloodBankController::class, 'updateStatus']);
+        Route::apiResource('users', UserController::class)->except(['store', 'create']);
+    });
 }); 

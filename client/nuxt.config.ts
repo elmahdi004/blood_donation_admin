@@ -12,7 +12,7 @@ export default defineNuxtConfig({
     enabled: true,
   },
   router: {
-    // middleware: ["auth.global"], // applies to every route
+    middleware: ["auth"],
   },
   css: ["~/assets/css/main.css"],
 

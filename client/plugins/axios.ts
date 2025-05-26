@@ -1,20 +1,4 @@
 import axios, { type AxiosInstance } from "axios";
-// import type { AxiosInstance } from "axios";
-
-// declare module "#app" {
-//   interface NuxtApp {
-//     $api: AxiosInstance;
-//   }
-// }
-
-// declare module "@vue/runtime-core" {
-//   interface ComponentCustomProperties {
-//     $api: AxiosInstance;
-//   }
-// }
-
-// export default defineNuxtPlugin((nuxtApp) => {
-//   const config = useRuntimeConfig();
 
 const api: AxiosInstance = axios.create({
   baseURL: "http://127.0.0.1:8000/api",
@@ -42,11 +26,10 @@ api.interceptors.response.use(
     console.error("API Error:", error.response || error);
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-    //   navigateTo("/login");
+      //   navigateTo("/login");
     }
     return Promise.reject(error);
   }
 );
 
 export default api;
-

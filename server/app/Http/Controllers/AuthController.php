@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\BloodBank;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -50,19 +51,48 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            throw ValidationException::withMessages([
-                'email' => ['Les identifiants fournis sont incorrects.'],
+        // First, try to find an admin user
+        $user = User::where('email', $request->email)
+                   ->where('type', 'admin')
+                   ->first();
+
+        if ($user && Hash::check($request->password, $user->password)) {
+            $token = $user->createToken('auth_token')->plainTextToken;
+            return response()->json([
+                'message' => 'Connexion réussie',
+                'user' => $user,
+                'token' => $token,
+                'type' => 'admin'
             ]);
         }
 
-        $user = User::where('email', $request->email)->firstOrFail();
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // If not an admin, try blood bank
+        $bloodBank = BloodBank::where('email', $request->email)->first();
 
-        return response()->json([
-            'message' => 'Connexion réussie',
-            'user' => $user,
-            'token' => $token
+        if ($bloodBank && Hash::check($request->password, $bloodBank->password)) {
+            if ($bloodBank->isPending()) {
+                throw ValidationException::withMessages([
+                    'email' => ['Votre compte est en attente d\'approbation.'],
+                ]);
+            }
+
+            if ($bloodBank->isRejected()) {
+                throw ValidationException::withMessages([
+                    'email' => ['Votre compte a été rejeté. Veuillez contacter l\'administrateur.'],
+                ]);
+            }
+
+            $token = $bloodBank->createToken('auth_token')->plainTextToken;
+            return response()->json([
+                'message' => 'Connexion réussie',
+                'user' => $bloodBank,
+                'token' => $token,
+                'type' => 'blood_bank'
+            ]);
+        }
+
+        throw ValidationException::withMessages([
+            'email' => ['Les identifiants fournis sont incorrects.'],
         ]);
     }
 

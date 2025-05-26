@@ -39,13 +39,17 @@ import api from "../plugins/axios";
 
 interface User {
   id: number;
-  nom: string;
-  prenom: string;
+  nom?: string;
+  prenom?: string;
+  name?: string; // For blood banks
   email: string;
-  telephone: string;
-  date_de_naissance: string;
-  groupe_sanguin: string;
-  adresse: string;
+  telephone?: string;
+  phone?: string; // For blood banks
+  date_de_naissance?: string;
+  groupe_sanguin?: string;
+  adresse?: string;
+  address?: string; // For blood banks
+  type?: "admin" | "blood_bank";
 }
 
 interface RegisterData {
@@ -64,11 +68,13 @@ interface AuthResponse {
   message: string;
   user: User;
   token: string;
+  type: "admin" | "blood_bank";
 }
 
 export const useAuth = () => {
   const user = ref<User | null>(null);
   const token = ref<string | null>(null);
+  const userType = ref<"admin" | "blood_bank" | null>(null);
 
   const login = async (
     email: string,
@@ -88,10 +94,12 @@ export const useAuth = () => {
       if (response.data.token) {
         token.value = response.data.token;
         user.value = response.data.user;
+        userType.value = response.data.type;
 
-        // Store token in localStorage if remember is true
+        // Store token and user type in localStorage if remember is true
         if (remember) {
           localStorage.setItem("token", response.data.token);
+          localStorage.setItem("userType", response.data.type);
         }
 
         return response.data;
@@ -145,16 +153,24 @@ export const useAuth = () => {
 
   const checkAuth = async () => {
     const storedToken = localStorage.getItem("token");
+    const storedType = localStorage.getItem("userType") as
+      | "admin"
+      | "blood_bank"
+      | null;
+
     if (storedToken) {
       try {
         const response = await api.get<User>("/user");
         user.value = response.data;
         token.value = storedToken;
+        userType.value = storedType;
       } catch (error) {
         console.error("Auth check error:", error);
         user.value = null;
         token.value = null;
+        userType.value = null;
         localStorage.removeItem("token");
+        localStorage.removeItem("userType");
       }
     }
   };
@@ -162,6 +178,7 @@ export const useAuth = () => {
   return {
     user,
     token,
+    userType,
     login,
     register,
     logout,

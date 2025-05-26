@@ -31,6 +31,14 @@ const links = [
       },
     },
     {
+      label: "Users",
+      icon: "i-lucide-users",
+      to: "/users",
+      onSelect: () => {
+        open.value = false;
+      },
+    },
+    {
       label: "Inbox",
       icon: "i-lucide-inbox",
       to: "/inbox",

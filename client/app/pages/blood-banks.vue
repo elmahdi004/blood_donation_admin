@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="overflow-y: auto">
     <UDashboardPanel id="blood-banks">
       <template #header>
         <UDashboardNavbar title="Centres de Don de Sang">
@@ -180,6 +180,42 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Details Modal -->
+    <UModal
+      v-model:open="showDetailsModal"
+      title="Détails du Centre de Don de Sang"
+    >
+      <template #body>
+        <div v-if="detailsBank" class="space-y-2">
+          <div><strong>Nom:</strong> {{ detailsBank.name }}</div>
+          <div><strong>Adresse:</strong> {{ detailsBank.address }}</div>
+          <div><strong>Région:</strong> {{ detailsBank.region }}</div>
+          <div><strong>Téléphone:</strong> {{ detailsBank.phone }}</div>
+          <div><strong>Email:</strong> {{ detailsBank.email }}</div>
+          <div><strong>Horaires:</strong> {{ detailsBank.opening_hours }}</div>
+          <div><strong>Statut:</strong> {{ detailsBank.status }}</div>
+          <div>
+            <strong>Date de création:</strong>
+            {{ new Date(detailsBank.created_at).toLocaleString("fr-FR") }}
+          </div>
+          <div>
+            <strong>Date de modification:</strong>
+            {{ new Date(detailsBank.updated_at).toLocaleString("fr-FR") }}
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex justify-end">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            @click="showDetailsModal = false"
+            >Fermer</UButton
+          >
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -217,6 +253,8 @@ const showModal = ref(false);
 const showDeleteModal = ref(false);
 const isEditing = ref(false);
 const selectedBloodBank = ref<BloodBank | null>(null);
+const showDetailsModal = ref(false);
+const detailsBank = ref<BloodBank | null>(null);
 
 const filters = ref({
   search: "",
@@ -319,6 +357,15 @@ const columns: TableColumn<BloodBank>[] = [
             type: "button",
           },
           "Supprimer"
+        ),
+        h(
+          "button",
+          {
+            class: "text-gray-600 hover:underline",
+            onClick: () => openDetailsModal(bank),
+            type: "button",
+          },
+          "Détails"
         ),
       ];
       if (bank.status === "pending") {
@@ -501,6 +548,11 @@ const rejectBank = async (bank: BloodBank) => {
   } catch (error: any) {
     toast.error(error?.message || "Erreur lors du rejet");
   }
+};
+
+const openDetailsModal = (bank: BloodBank) => {
+  detailsBank.value = bank;
+  showDetailsModal.value = true;
 };
 
 watch([page, perPage], fetchBloodBanks, { deep: true });
