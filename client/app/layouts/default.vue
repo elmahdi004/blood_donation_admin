@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { useAuthUser } from "../composables/useAuthUser";
+
 const route = useRoute();
 const toast = useToast();
+const authUser = useAuthUser();
+const userType = computed(() => authUser.value?.type);
 
 const open = ref(false);
 
@@ -22,14 +26,18 @@ const links = [
         open.value = false;
       },
     },
-    {
-      label: "Blood Banks",
-      icon: "i-lucide-heart-plus",
-      to: "/blood-banks",
-      onSelect: () => {
-        open.value = false;
-      },
-    },
+    ...(userType.value === "admin"
+      ? [
+          {
+            label: "Blood Banks",
+            icon: "i-lucide-heart-plus",
+            to: "/blood-banks",
+            onSelect: () => {
+              open.value = false;
+            },
+          },
+        ]
+      : []),
     {
       label: "Users",
       icon: "i-lucide-users",

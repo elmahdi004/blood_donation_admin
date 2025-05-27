@@ -60,8 +60,9 @@ import type { TableColumn } from "@nuxt/ui";
 const UBadge = resolveComponent("UBadge");
 
 // definePageMeta({
-//   middleware: "auth",
-// });
+//   middleware: ['auth', 'role'],
+//   allowedRoles: ['admin', 'blood_bank']
+// })
 
 type Demande = {
   demande_id: number;

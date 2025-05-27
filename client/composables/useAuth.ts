@@ -3,6 +3,7 @@ import { ref } from "vue";
 // import axios from "axios";
 // import type { AxiosInstance } from "axios";
 import api from "../plugins/axios";
+import { useAuthUser } from "../composables/useAuthUser";
 
 // Create a new axios instance
 // const api: AxiosInstance = axios.create({
@@ -72,7 +73,7 @@ interface AuthResponse {
 }
 
 export const useAuth = () => {
-  const user = ref<User | null>(null);
+  const user = useAuthUser();
   const token = ref<string | null>(null);
   const userType = ref<"admin" | "blood_bank" | null>(null);
 
@@ -91,27 +92,25 @@ export const useAuth = () => {
       });
 
       console.log("Login response:", response.data);
-      if (response.data.token) {
+      if (response.data.token && response.data.user) {
         token.value = response.data.token;
         user.value = response.data.user;
         userType.value = response.data.type;
 
         // Store token and user type in localStorage if remember is true
-        if (remember) {
-          localStorage.setItem("token", response.data.token);
-          localStorage.setItem("userType", response.data.type);
-        }
+        // if (remember) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("userType", response.data.type);
+        // }
 
         return response.data;
       } else {
-        throw new Error("No token received from server");
+        throw new Error("No token or user received from server");
       }
     } catch (error: any) {
       console.error("Login error:", error);
-      throw new Error(
-        error.response?.data?.message ||
-          "Une erreur est survenue lors de la connexion"
-      );
+      throw new Error(error.response?.data?.message || "Login failed");
     }
   };
 
@@ -141,7 +140,9 @@ export const useAuth = () => {
       await api.post("/logout");
       user.value = null;
       token.value = null;
+      localStorage.removeItem("user");
       localStorage.removeItem("token");
+      localStorage.removeItem("userType");
     } catch (error: any) {
       console.error("Logout error:", error);
       throw new Error(
