@@ -61,4 +61,12 @@ class BloodBank extends Authenticatable
     {
         return $this->hasMany(BloodInventory::class);
     }
+    public function stocks()
+    {
+        return $this->hasMany(Stock::class,'centre_id');
+    }
+    public function rendezVousCentre()
+    {
+        return $this->hasMany(RendezVous::class,'centre_id');
+    }
 } 
