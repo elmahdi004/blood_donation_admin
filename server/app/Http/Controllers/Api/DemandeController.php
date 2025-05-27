@@ -23,4 +23,11 @@ class DemandeController extends Controller
         // Pagination (default 10 per page)
         return $query->paginate($request->get('per_page', 10));
     }
+
+    public function userDemandes($userId)
+    {
+        $user = \App\Models\User::findOrFail($userId);
+        $demandes = $user->demandes()->latest()->get();
+        return response()->json($demandes);
+    }
 }

@@ -243,6 +243,32 @@
         </div>
       </template>
     </UModal>
+
+    <UModal
+      v-model:open="showDemandesModal"
+      :title="`Demandes de ${selectedUser?.value?.nom || ''} ${
+        selectedUser?.value?.prenom || ''
+      }`"
+    >
+      <template #body>
+        <div v-if="demandesLoading">Chargement...</div>
+        <div v-else-if="demandesError">{{ demandesError }}</div>
+        <ul v-else>
+          <li v-for="demande in demandes" :key="demande.demande_id">
+            {{ demande.groupe_sanguin }} - {{ demande.status }} -
+            {{ demande.ville }}
+          </li>
+        </ul>
+      </template>
+      <template #footer>
+        <UButton
+          color="neutral"
+          variant="ghost"
+          @click="showDemandesModal = false"
+          >Fermer</UButton
+        >
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -343,6 +369,12 @@ const filteredUsers = computed(() => {
   });
 });
 
+const showDemandesModal = ref(false);
+const demandes = ref([]);
+const demandesLoading = ref(false);
+const demandesError = ref(null);
+const selectedUser = ref<User | null>(null);
+
 const columns = [
   { accessorKey: "nom", header: "Nom" },
   { accessorKey: "prenom", header: "Prénom" },
@@ -382,6 +414,15 @@ const columns = [
             type: "button",
           },
           "Supprimer"
+        ),
+        h(
+          "button",
+          {
+            class: "text-green-600 hover:underline",
+            onClick: () => navigateTo(`/users/${user.id}`),
+            type: "button",
+          },
+          "Voir Demandes"
         ),
       ]);
     },
@@ -495,6 +536,21 @@ const submitAdd = async () => {
     fetchUsers();
   } catch (err: any) {
     toast.error(err?.response?.data?.message || "Erreur lors de l'ajout");
+  }
+};
+
+const openUserDemandesModal = async (user: User) => {
+  selectedUser.value = user;
+  showDemandesModal.value = true;
+  demandesLoading.value = true;
+  try {
+    const response = await api.get(`/users/${user.id}/demandes`);
+    demandes.value = response.data;
+    demandesError.value = null;
+  } catch (err) {
+    demandesError.value = "Erreur lors du chargement des demandes";
+  } finally {
+    demandesLoading.value = false;
   }
 };
 

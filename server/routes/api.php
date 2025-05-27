@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\DemandeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BloodBankController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\IntentionDonController;
 
 // Public routes (no authentication required)
 Route::post('/register', [AuthController::class, 'register']);
@@ -26,5 +27,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('demandes', DemandeController::class);
         Route::patch('/blood-banks/{bloodBank}/status', [BloodBankController::class, 'updateStatus']);
         Route::apiResource('users', UserController::class)->except(['store', 'create']);
+        Route::get('/users/{user}/demandes', [DemandeController::class, 'userDemandes']);
     });
+
+    // Intention Don routes
+    Route::middleware(['auth:sanctum', 'role:admin'])->get('/intention-dons', [IntentionDonController::class, 'index']);
+    Route::middleware('auth:sanctum')->get('/users/{user}/intention-dons', [IntentionDonController::class, 'userIntentions']);
 }); 

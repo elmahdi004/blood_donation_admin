@@ -47,6 +47,14 @@ const links = [
       },
     },
     {
+      label: "Intention Donation",
+      icon: "i-lucide-users",
+      to: "/intention-dons",
+      onSelect: () => {
+        open.value = false;
+      },
+    },
+    {
       label: "Inbox",
       icon: "i-lucide-inbox",
       to: "/inbox",
