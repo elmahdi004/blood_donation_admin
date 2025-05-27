@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\IntentionDonController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\RendezVousController;
+use App\Http\Controllers\AvailableSlotController;
 
 // Public routes (no authentication required)
 Route::post('/register', [AuthController::class, 'register']);
@@ -48,5 +49,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/rendez-vous', [RendezVousController::class, 'store']);
         Route::put('/rendez-vous/{rendezVous}', [RendezVousController::class, 'update']);
         Route::delete('/rendez-vous/{rendezVous}', [RendezVousController::class, 'destroy']);
+
+        // Available slots management
+        Route::get('/slots', [AvailableSlotController::class, 'index']);
+        Route::post('/slots', [AvailableSlotController::class, 'store']);
+        Route::put('/slots/{slot}', [AvailableSlotController::class, 'update']);
+        Route::delete('/slots/{slot}', [AvailableSlotController::class, 'destroy']);
     });
 }); 

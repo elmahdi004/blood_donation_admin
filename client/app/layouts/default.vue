@@ -58,6 +58,14 @@ const links = [
               open.value = false;
             },
           },
+          {
+            label: "Creneaux disponibles",
+            icon: "i-lucide-droplet",
+            to: "/slots",
+            onSelect: () => {
+              open.value = false;
+            },
+          },
         ]
       : []),
     ...(userType.value === "admin"
