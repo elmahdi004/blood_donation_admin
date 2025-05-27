@@ -28,6 +28,17 @@ const valideOptions = [
   { label: "Non", value: "0" },
 ];
 
+const showEditModal = ref(false);
+const showDeleteModal = ref(false);
+const editIntention = ref(null);
+const deleteIntention = ref(null);
+const editForm = ref({
+  groupe_sanguin: "",
+  date_disponibilite: "",
+  valide: false,
+  notes: "",
+});
+
 const columns = [
   { accessorKey: "id", header: "ID" },
   { accessorKey: "groupe_sanguin", header: "Groupe Sanguin" },
@@ -47,6 +58,34 @@ const columns = [
         ? `${user.nom || ""} ${user.prenom || ""}`.trim()
         : row.getValue("user_id");
     },
+  },
+  {
+    accessorKey: "actions",
+    header: "Actions",
+    cell: ({ row }) => {
+      const intention = row.original;
+      return [
+        h(
+          "button",
+          {
+            class: "text-blue-600 hover:underline mr-2",
+            onClick: () => openEditModal(intention),
+            type: "button",
+          },
+          "Modifier"
+        ),
+        h(
+          "button",
+          {
+            class: "text-red-600 hover:underline",
+            onClick: () => openDeleteModal(intention),
+            type: "button",
+          },
+          "Supprimer"
+        ),
+      ];
+    },
+    sortable: false,
   },
 ];
 
@@ -74,6 +113,44 @@ const fetchIntentions = async () => {
 const resetFilters = () => {
   filters.value.groupe_sanguin = "";
   filters.value.valide = "";
+};
+
+const openEditModal = (intention) => {
+  editIntention.value = intention;
+  editForm.value = {
+    groupe_sanguin: intention.groupe_sanguin,
+    date_disponibilite: intention.date_disponibilite,
+    valide: intention.valide,
+    notes: intention.notes,
+  };
+  showEditModal.value = true;
+};
+
+const submitEdit = async () => {
+  if (!editIntention.value) return;
+  try {
+    await api.put(`/intention-dons/${editIntention.value.id}`, editForm.value);
+    showEditModal.value = false;
+    fetchIntentions();
+  } catch (err) {
+    error.value = "Erreur lors de la modification";
+  }
+};
+
+const openDeleteModal = (intention) => {
+  deleteIntention.value = intention;
+  showDeleteModal.value = true;
+};
+
+const submitDelete = async () => {
+  if (!deleteIntention.value) return;
+  try {
+    await api.delete(`/intention-dons/${deleteIntention.value.id}`);
+    showDeleteModal.value = false;
+    fetchIntentions();
+  } catch (err) {
+    error.value = "Erreur lors de la suppression";
+  }
 };
 
 onMounted(fetchIntentions);
@@ -125,6 +202,66 @@ watch(filters, fetchIntentions, { deep: true });
           </div>
         </UCard>
       </UContainer>
+      <UModal v-model:open="showEditModal" title="Modifier l'intention de don">
+        <template #body>
+          <div class="space-y-2">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Groupe sanguin</label
+              >
+              <USelect
+                v-model="editForm.groupe_sanguin"
+                :items="groupeSanguinOptions"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Date de disponibilité</label
+              >
+              <UInput v-model="editForm.date_disponibilite" type="date" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Validé</label
+              >
+              <USelect v-model="editForm.valide" :items="valideOptions" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Notes</label
+              >
+              <UInput v-model="editForm.notes" />
+            </div>
+          </div>
+        </template>
+        <template #footer>
+          <div class="flex justify-end gap-2">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              @click="showEditModal = false"
+              >Annuler</UButton
+            >
+            <UButton color="primary" @click="submitEdit">Enregistrer</UButton>
+          </div>
+        </template>
+      </UModal>
+      <UModal v-model:open="showDeleteModal" title="Confirmer la suppression">
+        <template #body>
+          <div>Voulez-vous vraiment supprimer cette intention de don ?</div>
+        </template>
+        <template #footer>
+          <div class="flex justify-end gap-2">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              @click="showDeleteModal = false"
+              >Annuler</UButton
+            >
+            <UButton color="error" @click="submitDelete">Supprimer</UButton>
+          </div>
+        </template>
+      </UModal>
     </template>
   </UDashboardPanel>
 </template>

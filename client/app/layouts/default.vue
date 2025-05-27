@@ -4,7 +4,21 @@ import { useAuthUser } from "../composables/useAuthUser";
 const route = useRoute();
 const toast = useToast();
 const authUser = useAuthUser();
-const userType = computed(() => authUser.value?.type);
+
+const getUserType = () => {
+  if (process.client) {
+    return localStorage.getItem("userType");
+  }
+  return null;
+};
+const userType = ref(getUserType());
+
+// Optionally, keep userType in sync with localStorage changes
+if (process.client) {
+  window.addEventListener("storage", () => {
+    userType.value = localStorage.getItem("userType");
+  });
+}
 
 const open = ref(false);
 
@@ -26,6 +40,26 @@ const links = [
         open.value = false;
       },
     },
+    ...(userType.value === "blood_bank"
+      ? [
+          {
+            label: "Gestion du Stock",
+            icon: "i-lucide-droplet",
+            to: "/stock",
+            onSelect: () => {
+              open.value = false;
+            },
+          },
+          {
+            label: "Rendez-vous",
+            icon: "i-lucide-droplet",
+            to: "/rendez-vous",
+            onSelect: () => {
+              open.value = false;
+            },
+          },
+        ]
+      : []),
     ...(userType.value === "admin"
       ? [
           {
