@@ -66,6 +66,14 @@ const links = [
               open.value = false;
             },
           },
+          {
+            label: "Charts",
+            icon: "i-lucide-charts",
+            to: "/charts",
+            onSelect: () => {
+              open.value = false;
+            },
+          },
         ]
       : []),
     ...(userType.value === "admin"

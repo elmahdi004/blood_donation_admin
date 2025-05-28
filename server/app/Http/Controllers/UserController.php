@@ -65,4 +65,15 @@ class UserController extends Controller
         $user->delete();
         return response()->json(['message' => 'Utilisateur supprimé']);
     }
+    public function show($id)
+{
+    $user = \App\Models\User::findOrFail($id);
+    return response()->json([
+        'nom' => $user->nom,
+        'prenom' => $user->prenom,
+        'email' => $user->email,
+        'telephone' => $user->telephone,
+        'groupe_sanguin' => $user->groupe_sanguin,
+    ]);
+}
 } 
