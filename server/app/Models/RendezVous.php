@@ -9,6 +9,10 @@ class RendezVous extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+    // protected $table = 'rendez_vouses';
+    protected $primaryKey = 'rendez_vous_id';
+
     public function user() {
         return $this->belongsTo(User::class, 'user_id');
     }

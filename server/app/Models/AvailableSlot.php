@@ -9,13 +9,17 @@ class AvailableSlot extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'date',
-        'start_time',
-        'end_time',
-        'max_appointments',
-        'blood_bank_id',
-    ];
+    protected $table = 'available_slots';
+    protected $primaryKey = 'slot_id';
+
+    // protected $fillable = [
+    //     'date',
+    //     'start_time',
+    //     'end_time',
+    //     'max_appointments',
+    //     'blood_bank_id',
+    // ];
+    protected $guarded = [];
 
     public function bloodBank()
     {
@@ -27,6 +31,6 @@ class AvailableSlot extends Model
     }
 
     public function rendezVous() {
-        return $this->hasOne(RendezVous::class, 'slot_id');
+        return $this->hasOne(RendezVous::class, 'slot_id','rendez_vous_id');
     }
 }

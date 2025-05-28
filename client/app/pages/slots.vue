@@ -1,11 +1,21 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import api from "../plugins/axios";
 import { h } from "vue";
 
 const slots = ref([]);
 const loading = ref(true);
 const error = ref(null);
+const selectedDate = ref(null);
+const showPublishModal = ref(false);
+const publishForm = ref({
+  morning_start: "",
+  morning_end: "",
+  morning_max: 1,
+  evening_start: "",
+  evening_end: "",
+  evening_max: 1,
+});
 
 const showEditModal = ref(false);
 const showDeleteModal = ref(false);
@@ -68,6 +78,52 @@ const submitDelete = async () => {
   }
 };
 
+const openPublishModal = (date) => {
+  selectedDate.value = date;
+  publishForm.value = {
+    morning_start: "",
+    morning_end: "",
+    morning_max: 1,
+    evening_start: "",
+    evening_end: "",
+    evening_max: 1,
+  };
+  showPublishModal.value = true;
+};
+
+const submitPublish = async () => {
+  if (!selectedDate.value) return;
+  try {
+    await api.post("/slots", {
+      date: selectedDate.value,
+      ...publishForm.value,
+    });
+    showPublishModal.value = false;
+    fetchSlots();
+  } catch (err) {
+    error.value = "Erreur lors de la publication des créneaux";
+  }
+};
+
+const filteredSlots = computed(() => {
+  if (!selectedDate.value) return [];
+  return slots.value.filter(slot => slot.date === selectedDate.value);
+});
+
+const morningSlots = computed(() => {
+  return filteredSlots.value.filter(slot => {
+    const hour = parseInt(slot.start_time.split(':')[0]);
+    return hour < 12;
+  });
+});
+
+const eveningSlots = computed(() => {
+  return filteredSlots.value.filter(slot => {
+    const hour = parseInt(slot.start_time.split(':')[0]);
+    return hour >= 12;
+  });
+});
+
 onMounted(fetchSlots);
 </script>
 
@@ -88,32 +144,28 @@ onMounted(fetchSlots);
           </template>
           <div v-if="loading">Chargement...</div>
           <div v-else-if="error">{{ error }}</div>
-          <UTable
-            v-else
-            :data="slots"
-            :columns="[
-              { accessorKey: 'date', header: 'Date' },
-              { accessorKey: 'start_time', header: 'Heure de début' },
-              { accessorKey: 'end_time', header: 'Heure de fin' },
-              { accessorKey: 'max_appointments', header: 'Max RDV' },
-              {
-                accessorKey: 'actions',
-                header: 'Actions',
-                cell: ({ row }) => [
-                  h('button', {
-                    class: 'text-blue-600 hover:underline mr-2',
-                    onClick: () => openEditModal(row.original),
-                    type: 'button'
-                  }, 'Modifier'),
-                  h('button', {
-                    class: 'text-red-600 hover:underline',
-                    onClick: () => openDeleteModal(row.original),
-                    type: 'button'
-                  }, 'Supprimer')
-                ],
-              }
-            ]"
-          />
+          <div v-else>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Sélectionner une date</label>
+              <UInput v-model="selectedDate" type="date" @change="openPublishModal(selectedDate)" />
+            </div>
+            <div v-if="selectedDate">
+              <h2 class="text-xl font-semibold mb-2">Période du matin</h2>
+              <div class="grid grid-cols-4 gap-2 mb-4">
+                <div v-for="slot in morningSlots" :key="slot.id" class="p-2 border rounded" :class="slot.rendez_vous_id ? 'bg-red-200' : 'bg-green-200'">
+                  <div class="text-sm">{{ slot.start_time }} - {{ slot.end_time }}</div>
+                  <div class="text-xs">{{ slot.rendezVous ? 'Réservé' : 'Disponible' }}</div>
+                </div>
+              </div>
+              <h2 class="text-xl font-semibold mb-2">Période du soir</h2>
+              <div class="grid grid-cols-4 gap-2">
+                <div v-for="slot in eveningSlots" :key="slot.id" class="p-2 border rounded" :class="slot.rendez_vous_id ? 'bg-red-200' : 'bg-green-200'">
+                  <div class="text-sm">{{ slot.start_time }} - {{ slot.end_time }}</div>
+                  <div class="text-xs">{{ slot.rendez_vous_id ? 'Réservé' : 'Disponible' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </UCard>
       </UContainer>
       <UModal v-model:open="showEditModal" title="Modifier le créneau">
@@ -155,6 +207,52 @@ onMounted(fetchSlots);
           </div>
         </template>
       </UModal>
+      <UModal v-model:open="showPublishModal" title="Publier les créneaux">
+        <template #body>
+          <div class="space-y-4">
+            <div>
+              <h3 class="font-medium">Période du matin</h3>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Début</label>
+                  <UInput v-model="publishForm.morning_start" type="time" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Fin</label>
+                  <UInput v-model="publishForm.morning_end" type="time" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Max RDV</label>
+                  <UInput v-model="publishForm.morning_max" type="number" min="1" />
+                </div>
+              </div>
+            </div>
+            <div>
+              <h3 class="font-medium">Période du soir</h3>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Début</label>
+                  <UInput v-model="publishForm.evening_start" type="time" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Fin</label>
+                  <UInput v-model="publishForm.evening_end" type="time" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Max RDV</label>
+                  <UInput v-model="publishForm.evening_max" type="number" min="1" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template #footer>
+          <div class="flex justify-end gap-2">
+            <UButton color="neutral" variant="ghost" @click="showPublishModal = false">Annuler</UButton>
+            <UButton color="primary" @click="submitPublish">Publier</UButton>
+          </div>
+        </template>
+      </UModal>
     </template>
   </UDashboardPanel>
-</template> 
+</template>

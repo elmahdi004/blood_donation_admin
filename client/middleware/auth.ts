@@ -20,17 +20,13 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   }
 
   // If blood bank, only allow access to /customers and related routes
-  if (
-    userType.value === "blood_bank" &&
-    !to.path.startsWith("/customers") &&
-    !publicPages.includes(to.path)
-  ) {
+  if (userType.value === 'blood_bank' && !to.path.startsWith('/customers') && !publicPages.includes(to.path)) {
     return navigateTo("/forbidden");
   }
 
   // If logged in and trying to access login/register, redirect to appropriate page
   if (user.value && publicPages.includes(to.path)) {
-    if (userType.value === "blood_bank") {
+    if (userType.value === 'blood_bank') {
       return navigateTo("/customers");
     }
     return navigateTo("/");
