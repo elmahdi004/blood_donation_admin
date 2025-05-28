@@ -10,6 +10,7 @@ use App\Http\Controllers\IntentionDonController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\RendezVousController;
 use App\Http\Controllers\AvailableSlotController;
+use App\Http\Controllers\AdminStatsController;
 
 
 // Public routes (no authentication required)
@@ -32,6 +33,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/blood-banks/{bloodBank}/status', [BloodBankController::class, 'updateStatus']);
         Route::apiResource('users', UserController::class)->except(['store', 'create']);
         Route::get('/users/{user}/demandes', [DemandeController::class, 'userDemandes']);
+
+        // Admin Statistics Routes
+        Route::middleware('role:admin')->group(function () {
+            Route::get('/admin/requests/stats', [AdminStatsController::class, 'getRequestStats']);
+            Route::get('/admin/stock/stats', [AdminStatsController::class, 'getStockStats']);
+            Route::get('/admin/intentions/stats', [AdminStatsController::class, 'getIntentionDonStats']);
+            Route::get('/admin/performance/stats', [AdminStatsController::class, 'getCenterPerformanceStats']);
+            Route::get('/admin/blood-group-distribution/stats', [AdminStatsController::class, 'getBloodGroupDistributionStats']);
+        });
     });
 
     // Intention Don routes

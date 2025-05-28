@@ -10,7 +10,7 @@ Chart.register(...registerables);
 const stockData = ref<any[]>([]);
 const stockLoading = ref(true);
 const stockError = ref<string | null>(null);
-const selectedBloodGroup = ref<string>('all');
+const selectedBloodGroup = ref<string>("all");
 
 // 2. Appointments per Month
 const appointmentsData = ref<any[]>([]);
@@ -28,6 +28,12 @@ const slotsError = ref<string | null>(null);
 // 4. Appointments by Status
 const appointmentStatusChartType = ref<"pie" | "bar">("pie");
 
+// 5. Admin Statistics
+const adminData = ref<any[]>([]);
+const adminLoading = ref(true);
+const adminError = ref<string | null>(null);
+const adminChartType = ref<"bar" | "line">("bar");
+
 const chartTypeOptions = ref([
   { label: "Barres", value: "bar" },
   { label: "Lignes", value: "line" },
@@ -37,21 +43,26 @@ const statusChartTypeOptions = ref([
   { label: "Barres", value: "bar" },
 ]);
 
+const adminChartTypeOptions = ref([
+  { label: "Barres", value: "bar" },
+  { label: "Lignes", value: "line" },
+]);
+
 const staticBloodGroups = ref([
-  { label: 'Tous', value: 'all' },
-  { label: 'A+', value: 'A+' },
-  { label: 'A-', value: 'A-' },
-  { label: 'B+', value: 'B+' },
-  { label: 'B-', value: 'B-' },
-  { label: 'AB+', value: 'AB+' },
-  { label: 'AB-', value: 'AB-' },
-  { label: 'O+', value: 'O+' },
-  { label: 'O-', value: 'O-' }
+  { label: "Tous", value: "all" },
+  { label: "A+", value: "A+" },
+  { label: "A-", value: "A-" },
+  { label: "B+", value: "B+" },
+  { label: "B-", value: "B-" },
+  { label: "AB+", value: "AB+" },
+  { label: "AB-", value: "AB-" },
+  { label: "O+", value: "O+" },
+  { label: "O-", value: "O-" },
 ]);
 
 // Add bloodGroups computed property
 const bloodGroups = computed(() => {
-  return stockData.value.map(item => item.groupe_sanguin).filter(Boolean);
+  return stockData.value.map((item) => item.groupe_sanguin).filter(Boolean);
 });
 
 onMounted(async () => {
@@ -85,6 +96,17 @@ onMounted(async () => {
     slotsError.value = "Erreur lors du chargement des créneaux";
   } finally {
     slotsLoading.value = false;
+  }
+
+  // Admin Statistics
+  try {
+    const response = await api.get("/admin/stats");
+    adminData.value = response.data;
+  } catch (err) {
+    adminError.value =
+      "Erreur lors du chargement des statistiques administrateur";
+  } finally {
+    adminLoading.value = false;
   }
 });
 
@@ -175,6 +197,54 @@ const appointmentsByStatusChartData = computed(() => {
     ],
   };
 });
+
+const adminActivityChartData = computed(() => {
+  const activityCounts: Record<string, number> = {};
+  adminData.value.forEach((admin) => {
+    const date = admin.last_activity
+      ? admin.last_activity.substring(0, 7)
+      : "Inconnu";
+    activityCounts[date] = (activityCounts[date] || 0) + 1;
+  });
+  const labels = Object.keys(activityCounts).sort();
+  return {
+    labels,
+    datasets: [
+      {
+        label: "Activité des administrateurs",
+        backgroundColor: "#8b5cf6",
+        borderColor: "#8b5cf6",
+        fill: adminChartType.value === "bar",
+        data: labels.map((l) => activityCounts[l] ?? 0),
+      },
+    ],
+  };
+});
+
+const adminRolesChartData = computed(() => {
+  const roleCounts: Record<string, number> = {};
+  adminData.value.forEach((admin) => {
+    const role = admin.role || "Inconnu";
+    roleCounts[role] = (roleCounts[role] || 0) + 1;
+  });
+  const labels = Object.keys(roleCounts);
+  return {
+    labels,
+    datasets: [
+      {
+        label: "Administrateurs par rôle",
+        backgroundColor: [
+          "#8b5cf6",
+          "#ec4899",
+          "#14b8a6",
+          "#f59e0b",
+          "#ef4444",
+        ],
+        data: labels.map((l) => roleCounts[l] ?? 0),
+      },
+    ],
+  };
+});
 </script>
 
 <template>
@@ -194,7 +264,12 @@ const appointmentsByStatusChartData = computed(() => {
             <template #header>
               <div class="flex items-center gap-4">
                 <h2 class="text-xl font-semibold">Stock par groupe sanguin</h2>
-                <USelect v-model="selectedBloodGroup" :items="staticBloodGroups" placeholder="Filtrer par groupe sanguin" class="w-48" />
+                <USelect
+                  v-model="selectedBloodGroup"
+                  :items="staticBloodGroups"
+                  placeholder="Filtrer par groupe sanguin"
+                  class="w-48"
+                />
               </div>
             </template>
             <div v-if="stockLoading">Chargement...</div>
@@ -264,6 +339,40 @@ const appointmentsByStatusChartData = computed(() => {
               />
             </div>
           </UCard>
+          <!-- 5. Admin Statistics -->
+          <!-- <UCard>
+            <template #header>
+              <div class="flex flex-col md:flex-row md:items-center gap-4">
+                <h2 class="text-xl font-semibold">
+                  Statistiques des administrateurs
+                </h2>
+                <div class="flex gap-2 items-center">
+                  <USelect
+                    v-model="adminChartType"
+                    :items="adminChartTypeOptions"
+                    class="w-32"
+                  />
+                </div>
+              </div> -->
+            <!-- </template>
+            <div v-if="adminLoading">Chargement...</div>
+            <div v-else-if="adminError">{{ adminError }}</div>
+            <div v-else class="space-y-8">
+              <div>
+                <h3 class="text-lg font-medium mb-4">
+                  Activité des administrateurs
+                </h3>
+                <component
+                  :is="adminChartType === 'bar' ? Bar : Line"
+                  :data="adminActivityChartData"
+                />
+              </div>
+              <div>
+                <h3 class="text-lg font-medium mb-4">Répartition par rôle</h3>
+                <Pie :data="adminRolesChartData" />
+              </div>
+            </div>
+          </UCard> -->
         </div>
       </UContainer>
     </template>

@@ -86,6 +86,14 @@ const links = [
               open.value = false;
             },
           },
+          {
+            label: "Charts",
+            icon: "i-lucide-heart-plus",
+            to: "/charts-admin",
+            onSelect: () => {
+              open.value = false;
+            },
+          },
         ]
       : []),
     {
