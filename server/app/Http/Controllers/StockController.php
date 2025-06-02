@@ -39,4 +39,35 @@ class StockController extends Controller
         $stock->delete();
         return response()->json(['message' => 'Stock supprimé']);
     }
+
+    public function getBloodBankStocks($id)
+    {
+        try {
+            $stocks = Stock::where('centre_id', $id)
+                ->select([
+                    'groupe_sanguin',
+                    'quantite'
+                ])
+                ->get();
+
+            if ($stocks->isEmpty()) {
+                return response()->json([
+                    'message' => 'No stocks found for this blood bank'
+                ], 404);
+            }
+
+            // Transform the data into a more frontend-friendly format
+            $formattedStocks = [];
+            foreach ($stocks as $stock) {
+                $formattedStocks[$stock->groupe_sanguin] = $stock->quantite;
+            }
+
+            return response()->json($formattedStocks);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error fetching blood bank stocks',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 } 

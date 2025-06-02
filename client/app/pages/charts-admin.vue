@@ -49,7 +49,8 @@ onMounted(async () => {
     const response = await api.get("/admin/requests/stats");
     requestsData.value = response.data;
   } catch (err) {
-    requestsError.value = "Erreur lors du chargement des statistiques des demandes";
+    requestsError.value =
+      "Erreur lors du chargement des statistiques des demandes";
   } finally {
     requestsLoading.value = false;
   }
@@ -69,7 +70,8 @@ onMounted(async () => {
     const response = await api.get("/admin/intentions/stats");
     intentionsData.value = response.data;
   } catch (err) {
-    intentionsError.value = "Erreur lors du chargement des statistiques des intentions de don";
+    intentionsError.value =
+      "Erreur lors du chargement des statistiques des intentions de don";
   } finally {
     intentionsLoading.value = false;
   }
@@ -79,7 +81,8 @@ onMounted(async () => {
     const response = await api.get("/admin/performance/stats");
     performanceData.value = response.data;
   } catch (err) {
-    performanceError.value = "Erreur lors du chargement des statistiques de performance";
+    performanceError.value =
+      "Erreur lors du chargement des statistiques de performance";
   } finally {
     performanceLoading.value = false;
   }
@@ -89,7 +92,8 @@ onMounted(async () => {
     const response = await api.get("/admin/blood-group-distribution/stats");
     distributionData.value = response.data;
   } catch (err) {
-    distributionError.value = "Erreur lors du chargement des statistiques de distribution";
+    distributionError.value =
+      "Erreur lors du chargement des statistiques de distribution";
   } finally {
     distributionLoading.value = false;
   }
@@ -99,7 +103,9 @@ onMounted(async () => {
 const requestsByDayChartData = computed(() => {
   const counts: Record<string, number> = {};
   requestsData.value.forEach((request) => {
-    const date = request.created_at ? request.created_at.substring(0, 10) : "Inconnu";
+    const date = request.created_at
+      ? request.created_at.substring(0, 10)
+      : "Inconnu";
     counts[date] = (counts[date] || 0) + 1;
   });
   const labels = Object.keys(counts).sort();
@@ -120,18 +126,21 @@ const requestsByDayChartData = computed(() => {
 // Stock by Center Chart
 const stockByCenterChartData = computed(() => {
   const centerData: Record<string, Record<string, number>> = {};
-  
+
   stockData.value.forEach((item) => {
     const center = item.center_name || "Inconnu";
     const bloodGroup = item.groupe_sanguin || "Inconnu";
-    
+
     if (!centerData[center]) {
       centerData[center] = {};
     }
-    centerData[center][bloodGroup] = (centerData[center][bloodGroup] || 0) + Number(item.quantite);
+    centerData[center][bloodGroup] =
+      (centerData[center][bloodGroup] || 0) + Number(item.quantite);
   });
 
-  const bloodGroups = Array.from(new Set(stockData.value.map(item => item.groupe_sanguin))).sort();
+  const bloodGroups = Array.from(
+    new Set(stockData.value.map((item) => item.groupe_sanguin))
+  ).sort();
   const centers = Object.keys(centerData);
 
   return {
@@ -148,7 +157,7 @@ const stockByCenterChartData = computed(() => {
         "#14b8a6",
         "#fbbf24",
       ][index % 8],
-      data: centers.map(center => centerData[center][group] || 0),
+      data: centers.map((center) => centerData[center][group] || 0),
     })),
   };
 });
@@ -204,17 +213,17 @@ const intentionsByDayChartData = computed(() => {
 // Center Performance Chart
 const centerPerformanceChartData = computed(() => {
   return {
-    labels: performanceData.value.map(item => item.center_name),
+    labels: performanceData.value.map((item) => item.center_name),
     datasets: [
       {
         label: "Donations totales",
         backgroundColor: "#3b82f6",
-        data: performanceData.value.map(item => item.total_donations),
+        data: performanceData.value.map((item) => item.total_donations),
       },
       {
         label: "Donations complétées",
         backgroundColor: "#22c55e",
-        data: performanceData.value.map(item => item.completed_donations),
+        data: performanceData.value.map((item) => item.completed_donations),
       },
     ],
   };
@@ -223,7 +232,7 @@ const centerPerformanceChartData = computed(() => {
 // Blood Group Distribution Chart
 const bloodGroupDistributionChartData = computed(() => {
   return {
-    labels: distributionData.value.map(item => item.groupe_sanguin),
+    labels: distributionData.value.map((item) => item.groupe_sanguin),
     datasets: [
       {
         label: "Quantité totale",
@@ -237,7 +246,7 @@ const bloodGroupDistributionChartData = computed(() => {
           "#14b8a6",
           "#fbbf24",
         ],
-        data: distributionData.value.map(item => item.total_quantity),
+        data: distributionData.value.map((item) => item.total_quantity),
       },
     ],
   };
@@ -295,7 +304,9 @@ const bloodGroupDistributionChartData = computed(() => {
           <!-- Request Status Distribution -->
           <UCard>
             <template #header>
-              <h2 class="text-xl font-semibold">Répartition des statuts des demandes</h2>
+              <h2 class="text-xl font-semibold">
+                Répartition des statuts des demandes
+              </h2>
             </template>
             <div v-if="requestsLoading">Chargement...</div>
             <div v-else-if="requestsError">{{ requestsError }}</div>
@@ -308,7 +319,9 @@ const bloodGroupDistributionChartData = computed(() => {
           <UCard>
             <template #header>
               <div class="flex flex-col md:flex-row md:items-center gap-4">
-                <h2 class="text-xl font-semibold">Intentions de don par jour</h2>
+                <h2 class="text-xl font-semibold">
+                  Intentions de don par jour
+                </h2>
                 <div class="flex gap-2 items-center">
                   <USelect
                     v-model="intentionChartType"
@@ -343,7 +356,9 @@ const bloodGroupDistributionChartData = computed(() => {
           <!-- Blood Group Distribution Chart -->
           <UCard>
             <template #header>
-              <h2 class="text-xl font-semibold">Distribution des groupes sanguins</h2>
+              <h2 class="text-xl font-semibold">
+                Distribution des groupes sanguins
+              </h2>
             </template>
             <div v-if="distributionLoading">Chargement...</div>
             <div v-else-if="distributionError">{{ distributionError }}</div>

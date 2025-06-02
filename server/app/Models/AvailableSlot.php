@@ -12,14 +12,13 @@ class AvailableSlot extends Model
     protected $table = 'available_slots';
     protected $primaryKey = 'slot_id';
 
-    // protected $fillable = [
-    //     'date',
-    //     'start_time',
-    //     'end_time',
-    //     'max_appointments',
-    //     'blood_bank_id',
-    // ];
-    protected $guarded = [];
+    protected $fillable = [
+        'date',
+        'start_time',
+        'end_time',
+        'max_appointments',
+        'centre_id'
+    ];
 
     public function bloodBank()
     {
@@ -30,7 +29,8 @@ class AvailableSlot extends Model
         return $this->belongsTo(User::class, 'centre_id');
     }
 
-    public function rendezVous() {
-        return $this->hasOne(RendezVous::class, 'slot_id','rendez_vous_id');
+    public function rendezVous()
+    {
+        return $this->hasOne(RendezVous::class, 'slot_id');
     }
 }

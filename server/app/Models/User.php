@@ -75,9 +75,7 @@ class User extends Authenticatable
         return $this->hasMany(RendezVous::class, 'user_id');
     }
 
-    public function rendezVousCentre() {
-        return $this->hasMany(RendezVous::class, 'centre_id');
-    }
+
 
     public function stocks() {
         return $this->hasMany(Stock::class, 'centre_id');

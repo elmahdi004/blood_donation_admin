@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Proposition extends Model
 {
+    protected $fillable = ['demande_id', 'user_id', 'date', 'message'];
+
     public function demande() {
         return $this->belongsTo(Demande::class);
     }

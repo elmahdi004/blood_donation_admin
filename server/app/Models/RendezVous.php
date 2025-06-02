@@ -18,7 +18,7 @@ class RendezVous extends Model
     }
 
     public function centre() {
-        return $this->belongsTo(User::class, 'centre_id');
+        return $this->belongsTo(BloodBank::class, 'centre_id');
     }
 
     public function slot() {

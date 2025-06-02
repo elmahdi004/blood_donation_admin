@@ -6,6 +6,8 @@ use App\Models\AvailableSlot;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Models\RendezVous;
 
 class AvailableSlotController extends Controller
 {
@@ -105,5 +107,48 @@ class AvailableSlotController extends Controller
     {
         $slot->delete();
         return response()->json(['message' => 'Créneau supprimé']);
+    }
+
+    public function getAvailableSlots($bloodBankId, Request $request)
+    {
+        try {
+            $date = $request->query('date');
+            if (!$date) {
+                return response()->json([
+                    'message' => 'Date parameter is required'
+                ], 400);
+            }
+
+            // Get all slots for the blood bank with their appointments
+            $slots = AvailableSlot::where('centre_id', $bloodBankId)
+                ->where('date', $date)
+                ->with(['rendezVous'])
+                ->get();
+
+            if ($slots->isEmpty()) {
+                return response()->json([], 200);
+            }
+
+            // Calculate available slots for each time slot
+            $availableSlots = $slots->map(function ($slot) {
+                $isBooked = $slot->rendezVous !== null;
+                
+                return [
+                    'slot_id' => $slot->slot_id,
+                    'start_time' => $slot->start_time,
+                    'end_time' => $slot->end_time,
+                    'is_booked' => $isBooked ? 1 : 0,
+                    'rendez_vous' => $slot->rendezVous,
+                ];
+            })->values();
+
+            return response()->json($availableSlots);
+        } catch (\Exception $e) {
+            \Log::error('Error in getAvailableSlots: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error fetching available slots',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 } 

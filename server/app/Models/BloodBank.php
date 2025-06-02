@@ -73,4 +73,5 @@ class BloodBank extends Authenticatable
     {
         return $this->hasMany(AvailableSlot::class,'centre_id');
     }
+    
 } 

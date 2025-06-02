@@ -11,24 +11,40 @@ use App\Http\Controllers\StockController;
 use App\Http\Controllers\RendezVousController;
 use App\Http\Controllers\AvailableSlotController;
 use App\Http\Controllers\AdminStatsController;
+use App\Http\Controllers\DonorController;
+use App\Http\Controllers\BloodRequestController;
+use App\Http\Controllers\PropositionController;
 
 
 // Public routes (no authentication required)
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/mobile/login', [AuthController::class, 'mobileLogin']);
 Route::post('/blood-banks/register', [BloodBankController::class, 'register']);
 Route::post('/blood-banks/login', [BloodBankController::class, 'login']);
 
 // Protected routes (require authentication)
 Route::middleware('auth:sanctum')->group(function () {
+    // Public authenticated routes
+    Route::get('/blood-banks', [BloodBankController::class, 'index']);
+    Route::get('/blood-banks/{bloodBank}', [BloodBankController::class, 'show']);
+
     // User info route
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    // Blood requests routes
+    Route::get('/blood-requests', [BloodRequestController::class, 'index']);
+    Route::post('/blood-requests', [BloodRequestController::class, 'store']);
+
+    // Donors routes
+    Route::get('/donors', [DonorController::class, 'index']);
+    Route::get('/blood-banks/{bloodBank}/slots', [AvailableSlotController::class, 'getAvailableSlots']);
+
     // Routes that require specific roles
     Route::middleware('role:admin,blood_bank')->group(function () {
         // Blood Bank Management Routes
-        Route::apiResource('blood-banks', BloodBankController::class)->except(['store']);
+        Route::apiResource('blood-banks', BloodBankController::class)->except(['index', 'show', 'store']);
         Route::apiResource('demandes', DemandeController::class);
         Route::patch('/blood-banks/{bloodBank}/status', [BloodBankController::class, 'updateStatus']);
         Route::apiResource('users', UserController::class)->except(['store', 'create']);
@@ -67,4 +83,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/slots/{slot}', [AvailableSlotController::class, 'update']);
         Route::delete('/slots/{slot}', [AvailableSlotController::class, 'destroy']);
     });
+
+    // Proposition routes
+    Route::post('/propositions', [PropositionController::class, 'store']);
+
+    // Blood Bank Routes
+    Route::get('/blood-banks', [BloodBankController::class, 'index']);
+    Route::get('/blood-banks/{id}', [BloodBankController::class, 'show']);
+    Route::post('/blood-banks', [BloodBankController::class, 'store']);
+    Route::put('/blood-banks/{id}', [BloodBankController::class, 'update']);
+    Route::delete('/blood-banks/{id}', [BloodBankController::class, 'destroy']);
+    Route::get('/blood-banks/{id}/stocks', [StockController::class, 'getBloodBankStocks']);
 }); 

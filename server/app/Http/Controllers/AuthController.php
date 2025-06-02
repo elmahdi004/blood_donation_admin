@@ -109,4 +109,31 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
+
+    public function mobileLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        // Try to find a regular user (donor or receiver)
+        $user = User::where('email', $request->email)
+                   ->where('type', 'utilisateur')
+                   ->first();
+
+        if ($user && Hash::check($request->password, $user->password)) {
+            $token = $user->createToken('mobile_token')->plainTextToken;
+            return response()->json([
+                'message' => 'Connexion réussie',
+                'user' => $user,
+                'token' => $token,
+                'type' => $user->type
+            ]);
+        }
+
+        throw ValidationException::withMessages([
+            'email' => ['Les identifiants fournis sont incorrects.'],
+        ]);
+    }
 } 

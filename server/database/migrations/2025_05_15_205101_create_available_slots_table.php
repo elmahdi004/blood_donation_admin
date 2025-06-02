@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('available_slots', function (Blueprint $table) {
             $table->id('slot_id');
-            $table->foreignId('centre_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('centre_id')->constrained('blood_banks','id')->onDelete('cascade');
             $table->dateTime('start_time');
             $table->dateTime('end_time');
             $table->boolean('is_booked')->default(false);
