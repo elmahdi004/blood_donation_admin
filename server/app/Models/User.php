@@ -84,4 +84,7 @@ class User extends Authenticatable
     public function availableSlots() {
         return $this->hasMany(AvailableSlot::class, 'centre_id');
     }
+    public function rendezVousCentre() {
+        return $this->hasOne(RendezVous::class, 'centre_id');
+    }
 }

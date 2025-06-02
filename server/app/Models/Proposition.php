@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Proposition extends Model
 {
-    protected $fillable = ['demande_id', 'user_id', 'date', 'message'];
+    protected $table = 'propositions';
+    protected $primaryKey = 'proposition_id';
+    protected $guarded = [];
 
     public function demande() {
-        return $this->belongsTo(Demande::class);
+        return $this->belongsTo(Demande::class,'demande_id');
     }
 
     public function user() {

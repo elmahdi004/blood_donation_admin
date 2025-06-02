@@ -41,6 +41,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/donors', [DonorController::class, 'index']);
     Route::get('/blood-banks/{bloodBank}/slots', [AvailableSlotController::class, 'getAvailableSlots']);
 
+    Route::post('/rendez-vous', [RendezVousController::class, 'store']);
+
+    Route::get('/demandes/user', [DemandeController::class, 'getUserRequests']);
+
+    
     // Routes that require specific roles
     Route::middleware('role:admin,blood_bank')->group(function () {
         // Blood Bank Management Routes
@@ -73,7 +78,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Rendez-vous management
         Route::get('/rendez-vous', [RendezVousController::class, 'index']);
-        Route::post('/rendez-vous', [RendezVousController::class, 'store']);
         Route::put('/rendez-vous/{rendezVous}', [RendezVousController::class, 'update']);
         Route::delete('/rendez-vous/{rendezVous}', [RendezVousController::class, 'destroy']);
 
@@ -94,4 +98,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/blood-banks/{id}', [BloodBankController::class, 'update']);
     Route::delete('/blood-banks/{id}', [BloodBankController::class, 'destroy']);
     Route::get('/blood-banks/{id}/stocks', [StockController::class, 'getBloodBankStocks']);
+
+    // User appointments routes
+    Route::get('/users/{user}/rendez-vous', [RendezVousController::class, 'getUserAppointments']);
+    Route::post('/rendez-vous/{rendezVous}/cancel', [RendezVousController::class, 'cancelAppointment']);
+
+    // User intentions de dons routes
+    Route::get('/users/{user}/intentions-de-dons', [IntentionDonController::class, 'getUserIntentions']);
+    Route::post('/intentions-de-dons', [IntentionDonController::class, 'store']);
+    Route::delete('/intentions-de-dons/{intentionDon}', [IntentionDonController::class, 'destroy']);
+
+    // Blood Requests Routes
+    Route::post('/demandes', [DemandeController::class, 'createBloodRequest']);
+    Route::delete('/demandes/{id}', [DemandeController::class, 'deleteBloodRequest']);
 }); 

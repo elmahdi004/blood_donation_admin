@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id('proposition_id');
             $table->dateTime('date');
             $table->text('message')->nullable();
-            $table->foreignId('demande_id')->constrained('demandes')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('demande_id')->constrained('demandes','demande_id')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users','id')->onDelete('cascade');
             $table->timestamps();
         });
     }
