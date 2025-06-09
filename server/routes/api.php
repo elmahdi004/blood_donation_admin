@@ -44,8 +44,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/rendez-vous', [RendezVousController::class, 'store']);
 
     Route::get('/demandes/user', [DemandeController::class, 'getUserRequests']);
+// mes intentions 
+Route::get('/my-intentions', [IntentionDonController::class, 'getAuthIntentions']);
 
-    
     // Routes that require specific roles
     Route::middleware('role:admin,blood_bank')->group(function () {
         // Blood Bank Management Routes

@@ -19,9 +19,9 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'telephone' => 'required|string|regex:/^[0-9]{10}$/',
             'date_de_naissance' => 'required|date|before:-18 years',
-            'groupe_sanguin' => 'required|string|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
-            'adresse' => 'required|string|min:5',
-            'password' => 'required|string|min:8|confirmed',
+            'group_sanguin' => 'required|string|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'address' => 'required|string|min:5',
+            'password' => 'required|string|min:8',
         ]);
 
         $user = User::create([
@@ -30,8 +30,8 @@ class AuthController extends Controller
             'email' => $validated['email'],
             'telephone' => $validated['telephone'],
             'date_de_naissance' => $validated['date_de_naissance'],
-            'groupe_sanguin' => $validated['groupe_sanguin'],
-            'adresse' => $validated['adresse'],
+            'groupe_sanguin' => $validated['group_sanguin'],
+            'adresse' => $validated['address'],
             'password' => Hash::make($validated['password']),
         ]);
 

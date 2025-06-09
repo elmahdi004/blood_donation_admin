@@ -7,10 +7,11 @@ const UBadge = resolveComponent("UBadge");
 
 const rendezVous = ref([]);
 const loading = ref(true);
-const error = ref(null);
+const error = ref<string | null>(null);
 
 const filters = ref({
-  date: "",
+  slot_date: "",
+  status: "",
 });
 
 const showEditModal = ref(false);
@@ -19,17 +20,20 @@ const editRdv = ref<any>(null);
 const deleteRdv = ref<any>(null);
 const editForm = ref({
   user_id: "",
-  date: "",
+  created_at: "",
   status: "pending",
 });
 
 const fetchRendezVous = async () => {
   loading.value = true;
   try {
-    const params: Record<string, string> = { ...filters.value };
-    Object.keys(params).forEach((key) => {
-      if (params[key] === "") delete params[key];
-    });
+    const params: Record<string, string> = {};
+    if (filters.value.slot_date) {
+      params["slot_date"] = filters.value.slot_date;
+    }
+    if (filters.value.status) {
+      params["status"] = filters.value.status;
+    }
     const response = await api.get("/rendez-vous", { params });
     rendezVous.value = response.data;
   } catch (err) {
@@ -40,14 +44,15 @@ const fetchRendezVous = async () => {
 };
 
 const resetFilters = () => {
-  filters.value.date = "";
+  filters.value.slot_date = "";
+  filters.value.status = "";
 };
 
 const openEditModal = (entry: any) => {
   editRdv.value = entry;
   editForm.value = {
     user_id: entry.user_id,
-    date: entry.date,
+    created_at: entry.created_at,
     status: entry.status,
   };
   showEditModal.value = true;
@@ -84,51 +89,113 @@ onMounted(fetchRendezVous);
 watch(filters, fetchRendezVous, { deep: true });
 
 const columns = [
-  { accessorKey: "user_id", header: "Utilisateur" },
-  { accessorKey: "date", header: "Date" },
+  {
+    header: "Utilisateur",
+    cell: ({ row }: any) => {
+      const user = row.original.user;
+      if (!user) return "-";
+      return `${user.nom || ""} ${user.prenom || ""}`.trim();
+    },
+  },
+  // { accessorKey: "created_at", header: "Date" },
+  {
+    accessorKey: "slot.start_time",
+    header: "Début",
+    cell: ({ row }: any) => row.original.slot?.start_time || "-",
+  },
+  {
+    accessorKey: "slot.end_time",
+    header: "Fin",
+    cell: ({ row }: any) => row.original.slot?.end_time || "-",
+  },
+  {
+    accessorKey: "slot.date",
+    header: "Date du créneau",
+    cell: ({ row }: any) => row.original.slot?.date || "-",
+  },
   {
     accessorKey: "status",
     header: "Statut",
     cell: ({ row }: any) => {
-      const status = row.getValue("status");
-      const color =
-        {
-          pending: "warning",
-          confirmed: "success",
-          completed: "info",
-          cancelled: "error",
-        }[status] || "default";
+      const status: string = row.getValue("status");
+      const colorMap: Record<string, string> = {
+        pending: "warning",
+        confirmed: "success",
+        completed: "info",
+        cancelled: "error",
+      };
+      const color = colorMap[status] || "default";
       return h(
         UBadge,
-        { class: "capitalize", variant: "subtle", color },
-        () => status
+        { class: "capitalize px-3 py-1 text-sm", variant: "solid", color },
+        () => status.charAt(0).toUpperCase() + status.slice(1)
       );
     },
   },
   {
-    accessorKey: "actions",
-    header: "Actions",
-    cell: ({ row }: any) => [
-      h(
-        "button",
+    header: "Changer le statut",
+    cell: ({ row }: any) => {
+      const status: string = row.getValue("status");
+      const rendezVousId = row.original.rendez_vous_id;
+      const colorMap: Record<string, string> = {
+        pending: "warning",
+        confirmed: "success",
+        completed: "info",
+        cancelled: "error",
+      };
+      return h(
+        "select",
         {
-          class: "text-blue-600 hover:underline mr-2",
-          onClick: () => openEditModal(row.original),
-          type: "button",
+          value: status,
+          onChange: async (event: Event) => {
+            const newStatus = (event.target as HTMLSelectElement).value;
+            await api.put(`/rendez-vous/${rendezVousId}`, {
+              ...row.original,
+              status: newStatus,
+            });
+            fetchRendezVous();
+          },
+          class: "capitalize border rounded px-2 py-1",
         },
-        "Modifier"
-      ),
-      h(
-        "button",
-        {
-          class: "text-red-600 hover:underline",
-          onClick: () => openDeleteModal(row.original),
-          type: "button",
-        },
-        "Supprimer"
-      ),
-    ],
+        [
+          ["pending", "confirmed", "completed", "cancelled"].map((s) =>
+            h(
+              "option",
+              {
+                value: s,
+                selected: s === status,
+              },
+              s.charAt(0).toUpperCase() + s.slice(1)
+            )
+          ),
+        ]
+      );
+    },
   },
+  // {
+  //   accessorKey: "actions",
+  //   header: "Actions",
+  //   cell: ({ row }: any) => [
+  //     h(
+  //       "button",
+  //       {
+  //         class: "text-blue-600 hover:underline mr-2",
+  //         onClick: () => openEditModal(row.original),
+  //         type: "button",
+  //       },
+  //       "Modifier"
+  //     ),
+  //     h(
+  //       "button",
+  //       {
+  //         class: "text-red-600 hover:underline",
+  //         onClick: () => openDeleteModal(row.original),
+  //         type: "button",
+  //       },
+  //       "Supprimer"
+  //     ),
+  //   ],
+  // },
 ];
 </script>
 
@@ -149,9 +216,21 @@ const columns = [
           </template>
           <div class="flex flex-wrap gap-4 mb-4">
             <UInput
-              v-model="filters.date"
+              v-model="filters.slot_date"
               type="date"
-              placeholder="Filtrer par date"
+              placeholder="Filtrer par date du créneau"
+              class="w-48"
+            />
+            <USelect
+              v-model="filters.status"
+              :options="[
+                { label: 'Tous', value: '' },
+                { label: 'En attente', value: 'pending' },
+                { label: 'Confirmé', value: 'confirmed' },
+                { label: 'Terminé', value: 'completed' },
+                { label: 'Annulé', value: 'cancelled' },
+              ]"
+              placeholder="Filtrer par statut"
               class="w-48"
             />
             <UButton @click="resetFilters">Réinitialiser</UButton>
@@ -161,7 +240,7 @@ const columns = [
           <UTable v-else :data="rendezVous" :columns="columns" />
         </UCard>
       </UContainer>
-      <UModal v-model:open="showEditModal" title="Modifier le rendez-vous">
+      <UModal v-model="showEditModal" title="Modifier le rendez-vous">
         <template #body>
           <div class="space-y-2">
             <div>
@@ -174,7 +253,7 @@ const columns = [
               <label class="block text-sm font-medium text-gray-700 mb-1"
                 >Date</label
               >
-              <UInput v-model="editForm.date" type="date" />
+              <UInput v-model="editForm.created_at" type="date" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1"
@@ -196,7 +275,7 @@ const columns = [
           </div>
         </template>
       </UModal>
-      <UModal v-model:open="showDeleteModal" title="Confirmer la suppression">
+      <UModal v-model="showDeleteModal" title="Confirmer la suppression">
         <template #body>
           <div>Voulez-vous vraiment supprimer ce rendez-vous ?</div>
         </template>

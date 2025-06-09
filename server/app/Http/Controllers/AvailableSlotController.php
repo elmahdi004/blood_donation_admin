@@ -69,8 +69,8 @@ class AvailableSlotController extends Controller
                 'date' => $date,
                 'start_time' => $slotStart->format('H:i'),
                 'end_time' => $slotEnd->format('H:i'),
-                'max_appointments' => 1,
-                'blood_bank_id' => $bloodBank->id,
+                // 'max_appointments' => 1,
+                'centre_id' => $bloodBank->id,
             ];
         }
 
@@ -82,7 +82,7 @@ class AvailableSlotController extends Controller
                 'date' => $date,
                 'start_time' => $slotStart->format('H:i'),
                 'end_time' => $slotEnd->format('H:i'),
-                'max_appointments' => 1,
+                // 'max_appointments' => 1,
                 'blood_bank_id' => $bloodBank->id,
             ];
         }

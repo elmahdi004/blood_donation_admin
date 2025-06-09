@@ -32,19 +32,12 @@ const links = [
         open.value = false;
       },
     },
-    {
-      label: "Demandes",
-      icon: "i-lucide-heart-plus",
-      to: "/demandes",
-      onSelect: () => {
-        open.value = false;
-      },
-    },
+
     ...(userType.value === "blood_bank"
       ? [
           {
             label: "Gestion du Stock",
-            icon: "i-lucide-droplet",
+            icon: "i-lucide-warehouse",
             to: "/stock",
             onSelect: () => {
               open.value = false;
@@ -52,7 +45,7 @@ const links = [
           },
           {
             label: "Rendez-vous",
-            icon: "i-lucide-droplet",
+            icon: "i-lucide-ticket-slash",
             to: "/rendez-vous",
             onSelect: () => {
               open.value = false;
@@ -67,8 +60,8 @@ const links = [
             },
           },
           {
-            label: "Charts",
-            icon: "i-lucide-charts",
+            label: "Statistiques",
+            icon: "i-lucide-chart-line",
             to: "/charts",
             onSelect: () => {
               open.value = false;
@@ -79,6 +72,22 @@ const links = [
     ...(userType.value === "admin"
       ? [
           {
+            label: "Demandes",
+            icon: "i-lucide-heart-plus",
+            to: "/demandes",
+            onSelect: () => {
+              open.value = false;
+            },
+          },
+          {
+            label: "Users",
+            icon: "i-lucide-users",
+            to: "/users",
+            onSelect: () => {
+              open.value = false;
+            },
+          },
+          {
             label: "Blood Banks",
             icon: "i-lucide-heart-plus",
             to: "/blood-banks",
@@ -87,99 +96,92 @@ const links = [
             },
           },
           {
-            label: "Charts",
-            icon: "i-lucide-heart-plus",
+            label: "Statistiques",
+            icon: "i-lucide-chart-line",
             to: "/charts-admin",
+            onSelect: () => {
+              open.value = false;
+            },
+          },
+          {
+            label: "Intention Donation",
+            icon: "i-lucide-users",
+            to: "/intention-dons",
             onSelect: () => {
               open.value = false;
             },
           },
         ]
       : []),
-    {
-      label: "Users",
-      icon: "i-lucide-users",
-      to: "/users",
-      onSelect: () => {
-        open.value = false;
-      },
-    },
-    {
-      label: "Intention Donation",
-      icon: "i-lucide-users",
-      to: "/intention-dons",
-      onSelect: () => {
-        open.value = false;
-      },
-    },
-    {
-      label: "Inbox",
-      icon: "i-lucide-inbox",
-      to: "/inbox",
-      badge: "4",
-      onSelect: () => {
-        open.value = false;
-      },
-    },
-    {
-      label: "Customers",
-      icon: "i-lucide-users",
-      to: "/customers",
-      onSelect: () => {
-        open.value = false;
-      },
-    },
-    {
-      label: "Settings",
-      to: "/settings",
-      icon: "i-lucide-settings",
-      defaultOpen: true,
-      children: [
-        {
-          label: "General",
-          to: "/settings",
-          exact: true,
-          onSelect: () => {
-            open.value = false;
-          },
-        },
-        {
-          label: "Members",
-          to: "/settings/members",
-          onSelect: () => {
-            open.value = false;
-          },
-        },
-        {
-          label: "Notifications",
-          to: "/settings/notifications",
-          onSelect: () => {
-            open.value = false;
-          },
-        },
-        {
-          label: "Security",
-          to: "/settings/security",
-          onSelect: () => {
-            open.value = false;
-          },
-        },
-      ],
-    },
-  ],
-  [
-    {
-      label: "Feedback",
-      icon: "i-lucide-message-circle",
-      to: "https://github.com/nuxt-ui-pro/dashboard",
-      target: "_blank",
-    },
-    {
-      label: "Help & Support",
-      icon: "i-lucide-info",
-      to: "https://github.com/nuxt/ui-pro",
-      target: "_blank",
-    },
+
+    // {
+    //   label: "Inbox",
+    //   icon: "i-lucide-inbox",
+    //   to: "/inbox",
+    //   badge: "4",
+    //   onSelect: () => {
+    //     open.value = false;
+    //   },
+    // },
+    // {
+    //   label: "Customers",
+    //   icon: "i-lucide-users",
+    //   to: "/customers",
+    //   onSelect: () => {
+    //     open.value = false;
+    //   },
+    // },
+    //   {
+    //     label: "Settings",
+    //     to: "/settings",
+    //     icon: "i-lucide-settings",
+    //     defaultOpen: true,
+    //     children: [
+    //       {
+    //         label: "General",
+    //         to: "/settings",
+    //         exact: true,
+    //         onSelect: () => {
+    //           open.value = false;
+    //         },
+    //       },
+    //       {
+    //         label: "Members",
+    //         to: "/settings/members",
+    //         onSelect: () => {
+    //           open.value = false;
+    //         },
+    //       },
+    //       {
+    //         label: "Notifications",
+    //         to: "/settings/notifications",
+    //         onSelect: () => {
+    //           open.value = false;
+    //         },
+    //       },
+    //       {
+    //         label: "Security",
+    //         to: "/settings/security",
+    //         onSelect: () => {
+    //           open.value = false;
+    //         },
+    //       },
+    //     ],
+    //   },
+    // ],
+    // [
+    //   {
+    //     label: "Feedback",
+    //     icon: "i-lucide-message-circle",
+    //     to: "https://github.com/nuxt-ui-pro/dashboard",
+    //     target: "_blank",
+    //   },
+    //   {
+    //     label: "Help & Support",
+    //     icon: "i-lucide-info",
+    //     to: "https://github.com/nuxt/ui-pro",
+    //     target: "_blank",
+    //   },
   ],
 ];
 

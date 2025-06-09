@@ -245,6 +245,24 @@ const adminRolesChartData = computed(() => {
     ],
   };
 });
+
+// Chart.js options to stabilize chart size
+const stockChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+};
+const appointmentsChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+};
+const slotUsageChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+};
+const appointmentsByStatusChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+};
 </script>
 
 <template>
@@ -260,7 +278,7 @@ const adminRolesChartData = computed(() => {
       <UContainer class="min-h-screen">
         <div class="space-y-8 py-8">
           <!-- 1. Stock par groupe sanguin -->
-          <UCard>
+          <UCard class="chart-card">
             <template #header>
               <div class="flex items-center gap-4">
                 <h2 class="text-xl font-semibold">Stock par groupe sanguin</h2>
@@ -275,11 +293,11 @@ const adminRolesChartData = computed(() => {
             <div v-if="stockLoading">Chargement...</div>
             <div v-else-if="stockError">{{ stockError }}</div>
             <div v-else>
-              <Bar :data="stockChartData" />
+              <Bar :data="stockChartData" :options="stockChartOptions" />
             </div>
           </UCard>
           <!-- 2. Rendez-vous par mois -->
-          <UCard>
+          <UCard class="chart-card">
             <template #header>
               <div class="flex flex-col md:flex-row md:items-center gap-4">
                 <h2 class="text-xl font-semibold">Rendez-vous par mois</h2>
@@ -304,22 +322,26 @@ const adminRolesChartData = computed(() => {
               <component
                 :is="appointmentsChartType === 'bar' ? Bar : Line"
                 :data="appointmentsChartData"
+                :options="appointmentsChartOptions"
               />
             </div>
           </UCard>
           <!-- 3. Utilisation des créneaux -->
-          <UCard>
+          <UCard class="chart-card">
             <template #header>
               <h2 class="text-xl font-semibold">Utilisation des créneaux</h2>
             </template>
             <div v-if="slotsLoading">Chargement...</div>
             <div v-else-if="slotsError">{{ slotsError }}</div>
             <div v-else>
-              <Pie :data="slotUsageChartData" />
+              <Pie
+                :data="slotUsageChartData"
+                :options="slotUsageChartOptions"
+              />
             </div>
           </UCard>
           <!-- 4. Rendez-vous par statut -->
-          <UCard>
+          <UCard class="chart-card">
             <template #header>
               <div class="flex items-center gap-4">
                 <h2 class="text-xl font-semibold">Rendez-vous par statut</h2>
@@ -336,6 +358,7 @@ const adminRolesChartData = computed(() => {
               <component
                 :is="appointmentStatusChartType === 'pie' ? Pie : Bar"
                 :data="appointmentsByStatusChartData"
+                :options="appointmentsByStatusChartOptions"
               />
             </div>
           </UCard>
@@ -354,7 +377,7 @@ const adminRolesChartData = computed(() => {
                   />
                 </div>
               </div> -->
-            <!-- </template>
+          <!-- </template>
             <div v-if="adminLoading">Chargement...</div>
             <div v-else-if="adminError">{{ adminError }}</div>
             <div v-else class="space-y-8">
@@ -378,3 +401,14 @@ const adminRolesChartData = computed(() => {
     </template>
   </UDashboardPanel>
 </template>
+
+<style scoped>
+.chart-card {
+  min-height: 350px;
+}
+.chart-card canvas {
+  height: 100% !important;
+  width: 100% !important;
+  max-height: 350px;
+}
+</style>

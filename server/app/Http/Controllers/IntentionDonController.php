@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\IntentionDon;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class IntentionDonController extends Controller
@@ -94,5 +95,10 @@ class IntentionDonController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+    public function getAuthIntentions(){
+        $auth = Auth::user();
+        $intentions = IntentionDon::where('user_id', $auth->id)->get();
+        return response()->json($intentions);
     }
 } 

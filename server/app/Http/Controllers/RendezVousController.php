@@ -12,7 +12,15 @@ class RendezVousController extends Controller
     public function index(Request $request)
     {
         $bloodBank = $request->user();
-        $rendezVous = $bloodBank->rendezVousCentre()->latest()->get();
+        $query = $bloodBank->rendezVousCentre()->with(['slot','user'])->latest();
+    
+        if ($request->has('slot_date')) {
+            $query->whereHas('slot', function($q) use ($request) {
+                $q->where('date', $request->slot_date);
+            });
+        }
+    
+        $rendezVous = $query->get();
         return response()->json($rendezVous);
     }
 
