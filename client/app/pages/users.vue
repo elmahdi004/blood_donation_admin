@@ -37,12 +37,12 @@
                 placeholder="Filtrer par groupe sanguin"
                 class="w-48"
               />
-              <USelect
+              <!-- <USelect
                 v-model="filters.status"
                 :items="statusOptions"
                 placeholder="Statut"
                 class="w-48"
-              />
+              /> -->
               <UButton @click="resetFilters">Réinitialiser</UButton>
             </div>
             <div>
@@ -82,7 +82,7 @@
             <strong>Groupe sanguin:</strong> {{ detailsUser.groupe_sanguin }}
           </div>
           <div><strong>Adresse:</strong> {{ detailsUser.adresse }}</div>
-          <div><strong>Statut:</strong> {{ detailsUser.status }}</div>
+          <!-- <div><strong>Statut:</strong> {{ detailsUser.status }}</div> -->
           <div>
             <strong>Date de création:</strong>
             {{ new Date(detailsUser.created_at).toLocaleString("fr-FR") }}
@@ -381,7 +381,7 @@ const columns = [
   { accessorKey: "email", header: "Email" },
   { accessorKey: "telephone", header: "Téléphone" },
   { accessorKey: "groupe_sanguin", header: "Groupe sanguin" },
-  { accessorKey: "status", header: "Statut" },
+  // { accessorKey: "status", header: "Statut" },
   {
     accessorKey: "actions",
     header: "Actions",

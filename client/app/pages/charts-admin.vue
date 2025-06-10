@@ -43,6 +43,12 @@ const chartTypeOptions = ref([
   { label: "Lignes", value: "line" },
 ]);
 
+// Chart.js options to stabilize chart size
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+};
+
 onMounted(async () => {
   // Load Requests Data
   try {
@@ -266,7 +272,7 @@ const bloodGroupDistributionChartData = computed(() => {
       <UContainer class="min-h-screen">
         <div class="space-y-8 py-8">
           <!-- Requests by Day Chart -->
-          <UCard>
+          <UCard class="chart-card">
             <template #header>
               <div class="flex flex-col md:flex-row md:items-center gap-4">
                 <h2 class="text-xl font-semibold">Demandes par jour</h2>
@@ -285,24 +291,25 @@ const bloodGroupDistributionChartData = computed(() => {
               <component
                 :is="requestChartType === 'bar' ? Bar : Line"
                 :data="requestsByDayChartData"
+                :options="chartOptions"
               />
             </div>
           </UCard>
 
           <!-- Stock by Center Chart -->
-          <UCard>
+          <UCard class="chart-card">
             <template #header>
               <h2 class="text-xl font-semibold">Stock par centre</h2>
             </template>
             <div v-if="stockLoading">Chargement...</div>
             <div v-else-if="stockError">{{ stockError }}</div>
             <div v-else>
-              <Bar :data="stockByCenterChartData" />
+              <Bar :data="stockByCenterChartData" :options="chartOptions" />
             </div>
           </UCard>
 
           <!-- Request Status Distribution -->
-          <UCard>
+          <UCard class="chart-card">
             <template #header>
               <h2 class="text-xl font-semibold">
                 Répartition des statuts des demandes
@@ -311,12 +318,12 @@ const bloodGroupDistributionChartData = computed(() => {
             <div v-if="requestsLoading">Chargement...</div>
             <div v-else-if="requestsError">{{ requestsError }}</div>
             <div v-else>
-              <Pie :data="requestStatusChartData" />
+              <Pie :data="requestStatusChartData" :options="chartOptions" />
             </div>
           </UCard>
 
           <!-- Intentions de Don Chart -->
-          <UCard>
+          <UCard class="chart-card">
             <template #header>
               <div class="flex flex-col md:flex-row md:items-center gap-4">
                 <h2 class="text-xl font-semibold">
@@ -337,24 +344,25 @@ const bloodGroupDistributionChartData = computed(() => {
               <component
                 :is="intentionChartType === 'bar' ? Bar : Line"
                 :data="intentionsByDayChartData"
+                :options="chartOptions"
               />
             </div>
           </UCard>
 
           <!-- Center Performance Chart -->
-          <UCard>
+          <UCard class="chart-card">
             <template #header>
               <h2 class="text-xl font-semibold">Performance des centres</h2>
             </template>
             <div v-if="performanceLoading">Chargement...</div>
             <div v-else-if="performanceError">{{ performanceError }}</div>
             <div v-else>
-              <Bar :data="centerPerformanceChartData" />
+              <Bar :data="centerPerformanceChartData" :options="chartOptions" />
             </div>
           </UCard>
 
           <!-- Blood Group Distribution Chart -->
-          <UCard>
+          <UCard class="chart-card">
             <template #header>
               <h2 class="text-xl font-semibold">
                 Distribution des groupes sanguins
@@ -363,7 +371,7 @@ const bloodGroupDistributionChartData = computed(() => {
             <div v-if="distributionLoading">Chargement...</div>
             <div v-else-if="distributionError">{{ distributionError }}</div>
             <div v-else>
-              <Pie :data="bloodGroupDistributionChartData" />
+              <Pie :data="bloodGroupDistributionChartData" :options="chartOptions" />
             </div>
           </UCard>
         </div>
@@ -371,3 +379,14 @@ const bloodGroupDistributionChartData = computed(() => {
     </template>
   </UDashboardPanel>
 </template>
+
+<style scoped>
+.chart-card {
+  min-height: 350px;
+}
+.chart-card canvas {
+  height: 100% !important;
+  width: 100% !important;
+  max-height: 350px;
+}
+</style>

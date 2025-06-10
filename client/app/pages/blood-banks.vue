@@ -304,10 +304,10 @@ const columns: TableColumn<BloodBank>[] = [
     accessorKey: "email",
     header: "Email",
   },
-  {
-    accessorKey: "opening_hours",
-    header: "Horaires",
-  },
+  // {
+  //   accessorKey: "opening_hours",
+  //   header: "Horaires",
+  // },
   {
     accessorKey: "status",
     header: "Statut",

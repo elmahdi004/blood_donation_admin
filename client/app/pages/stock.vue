@@ -109,7 +109,7 @@ onMounted(fetchStock);
                       onClick: () => openDeleteModal(row.original),
                       type: 'button',
                     },
-                    'Supprimer'
+                    // 'Supprimer'
                   ),
                 ],
                 sortable: false,
