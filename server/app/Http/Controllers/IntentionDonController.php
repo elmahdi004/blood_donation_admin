@@ -51,7 +51,7 @@ class IntentionDonController extends Controller
     {
         $validated = $request->validate([
             'groupe_sanguin' => 'required|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
-            'date_disponibilite' => 'required|date|after:today',
+            'date_disponibilite' => 'required|date',
             'notes' => 'nullable|string|max:500',
         ]);
 

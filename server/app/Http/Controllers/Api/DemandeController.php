@@ -41,6 +41,7 @@ class DemandeController extends Controller
         $userId = Auth::id();
         $requests = Demande::where('user_id', $userId)
             ->with([
+                // 'user',
                 'propositions.user'
                 // 'user:id,nom,prenom,email,telephone',
                 // 'propositions' => function($query) {
